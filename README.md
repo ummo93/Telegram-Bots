@@ -14,11 +14,11 @@ TelegramBot bot = new TelegramBot(token);                  // Creates a bot obje
 
 bot.getAction((String payload, Chat dialog) -> {           // Print all action messages
     System.out.println(payload);
-}
+});
 
 bot.getMessage((TextMessage message, Chat dialog) -> {     // Return to the user his message
     dialog.post(message.text);
-}
+});
 
 bot.setPolling(1000L).run();                               // Check updates every second
  ```
