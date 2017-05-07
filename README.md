@@ -1,14 +1,14 @@
 # Easy telegram bot library
 
-![img](https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/Telegram_logo.svg/1024px-Telegram_logo.svg.png)
+![img](https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Telegram_text_logo.svg/500px-Telegram_text_logo.svg.png)
 
 #### Description
 Just create a bot with telegram "botfather", config handlers on text and action (callbacks) messages with this library.
 Library not packed yet, for simplify it usage, but it is in the plans.
 
-####For example:
+#### For example:
  ```java
-String token = "`123123123:ASAddmafawfqWD-123FwqafwaWFAf"; // Your bot token from botfather
+String token = "123123123:ASAddmafawfqWD-123FwqafwaWFAf"; // Your bot token from botfather
 
 TelegramBot bot = new TelegramBot(token);                  // Creates a bot object
 
