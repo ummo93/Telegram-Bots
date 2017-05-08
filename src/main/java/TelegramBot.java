@@ -122,11 +122,12 @@ public class TelegramBot {
                 textParse(event);
             }
             Thread.sleep(pollingInterval);
-
         } catch (IOException e) {
             System.out.println(e.getMessage());
+            System.exit(0);
         } catch (InterruptedException e) {
             System.out.println(e.getMessage());
+            System.exit(0);
         } finally {
             run();
         }
