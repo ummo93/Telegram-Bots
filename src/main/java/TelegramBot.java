@@ -3,7 +3,6 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.BiPredicate;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -17,15 +16,15 @@ import com.google.gson.*;
 
 
 public class TelegramBot {
-    
+
     private static long pollingInterval = 500L;
     private static int lastMessageTimestamp = 0;
     private static String addressWebhook = "https://api.telegram.org/bot";
     private static String updateMethod = "/getUpdates?offset=-1";
     private static String sendingMethod = "/sendMessage";
     private static String sendPhotoMethod = "/sendPhoto";
-    private static BiPredicate<TextMessage, Chat> reaction;
-    private static BiPredicate<String, Chat> reactionCallback;
+    private TextEvent<TextMessage, Chat> reaction;
+    private ActionEvent<String, Chat> reactionCallback;
 
     /**
      * Create a bot object. Example of usage:
@@ -59,8 +58,8 @@ public class TelegramBot {
      * }
      * </pre>
      */
-    public void getMessage(BiPredicate<TextMessage, Chat> lambda) {
-        reaction = lambda;
+    public void getMessage(TextEvent<TextMessage, Chat> lambda) {
+        this.reaction = lambda;
     }
 
     /**
@@ -72,8 +71,8 @@ public class TelegramBot {
      * }
      * </pre>
      */
-    public void getAction(BiPredicate<String, Chat> lambda) {
-        reactionCallback = lambda;
+    public void getAction(ActionEvent<String, Chat> lambda) {
+        this.reactionCallback = lambda;
     }
 
     /**
@@ -116,16 +115,13 @@ public class TelegramBot {
             JsonElement event = result.get(0);
             if(event.getAsJsonObject().has("callback_query")) {
                 // Callback
-                callbackParse(event);
+                this.callbackParse(event);
             } else {
                 // TextMessage
-                textParse(event);
+                this.textParse(event);
             }
             Thread.sleep(pollingInterval);
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
-            System.exit(0);
-        } catch (InterruptedException e) {
+        } catch (IOException | InterruptedException e) {
             System.out.println(e.getMessage());
             System.exit(0);
         } finally {
@@ -133,7 +129,7 @@ public class TelegramBot {
         }
     }
 
-    private static void callbackParse(JsonElement event) {
+    private void callbackParse(JsonElement event) {
         int timestamp = event.getAsJsonObject().get("update_id").getAsInt();
         if(timestamp != lastMessageTimestamp) {
             System.out.println(event);
@@ -143,12 +139,12 @@ public class TelegramBot {
             String last_name = message.get("chat").getAsJsonObject().get("last_name").getAsString();
             Chat chat = new Chat(chat_id, first_name, last_name);
             String payload = event.getAsJsonObject().get("callback_query").getAsJsonObject().get("data").getAsString();
-            reactionCallback.test(payload, chat);
+            this.reactionCallback.setEvent(payload, chat);
             lastMessageTimestamp = timestamp;
         }
     }
 
-    private static void textParse(JsonElement event) {
+    private void textParse(JsonElement event) {
         int timestamp = event.getAsJsonObject().get("message").getAsJsonObject().get("date").getAsInt();
         if(timestamp != lastMessageTimestamp) {
             System.out.println(event);
@@ -161,7 +157,7 @@ public class TelegramBot {
             String text = message.get("text").getAsString();
             TextMessage text_message = new TextMessage(message_id, message_date, text);
             Chat chat = new Chat(chat_id, first_name, last_name);
-            reaction.test(text_message, chat);
+            this.reaction.setEvent(text_message, chat);
             lastMessageTimestamp = timestamp;
         }
     }

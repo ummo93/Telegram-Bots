@@ -1,6 +1,6 @@
 public class Main {
     
-    static final String token = "<Your_bot_token>";
+    private static final String token = "Your_token_here";
 
     public static void main(String[] args) {
 
@@ -11,7 +11,6 @@ public class Main {
             dialog.sendPhoto("http://online-teacher.ru/image/french/eda.jpg");
             else
             dialog.post("Your variant is: " + payload);
-            return true;
         });
 
         bot.getMessage((TextMessage message, Chat dialog) -> {
@@ -34,7 +33,6 @@ public class Main {
                 default:
                     dialog.post(TelegramBot.askForHelp(message.text));
             }
-            return true;
         });
 
         bot.setPolling(1000L).run();
