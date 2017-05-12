@@ -1,6 +1,6 @@
 public class Main {
     
-    private static final String token = "Your_token(after_'bot')";
+    private static final String token = "392121257:AAGrLhQELYQ1Zj_-O8asyH2nabz63TtGmsc";
 
     public static void main(String[] args) {
 

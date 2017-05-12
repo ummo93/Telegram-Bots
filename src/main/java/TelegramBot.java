@@ -38,7 +38,7 @@ public class TelegramBot {
      * bot.getMessage((TextMessage message, Chat dialog) -> {
      *     dialog.post("Hello!");
      * }
-     * bot.setPolling(1500L).run();
+     * bot.polling().run();
      * </pre>
      */
     public TelegramBot(String address) {
