@@ -20,10 +20,8 @@ bot.getMessage((TextMessage message, Chat dialog) -> {     // Return to the user
     dialog.post(message.text);
 });
 
-bot.setPolling(1000L).run();                               // Check updates every second
+bot.polling().run();                                       // Check updates with long polling
  ```
-
-As you have watched, for update bot state i used i.e. "short polling" method. In the feature i want to use "long polling", because this is a most effective method...
 
 #### Supported message types
 Now this lib. supported only:

@@ -1,14 +1,17 @@
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -17,10 +20,11 @@ import com.google.gson.*;
 
 public class TelegramBot {
 
-    private static long pollingInterval = 500L;
+    private static int longPollTimeout = 300000;
     private static int lastMessageTimestamp = 0;
     private static String addressWebhook = "https://api.telegram.org/bot";
-    private static String updateMethod = "/getUpdates?offset=-1";
+    private static String updateMethod = "/getUpdates";
+    private static String offset = "?offset=-1";
     private static String sendingMethod = "/sendMessage";
     private static String sendPhotoMethod = "/sendPhoto";
     private TextEvent<TextMessage, Chat> reaction;
@@ -80,7 +84,7 @@ public class TelegramBot {
      */
     private static String getUpdates() throws IOException {
         CloseableHttpClient httpclient = HttpClients.createDefault();
-        HttpGet httpget = new HttpGet(addressWebhook + updateMethod);
+        HttpGet httpget = new HttpGet(addressWebhook + updateMethod + offset);
         CloseableHttpResponse response = httpclient.execute(httpget);
         int data = response.getEntity().getContent().read();
         char content;
@@ -94,13 +98,49 @@ public class TelegramBot {
         return body;
     }
 
+    private static String getPolling() throws IOException {
+
+        CloseableHttpClient httpclient = createHttpClient();
+        lastMessageTimestamp += 1;
+        HttpGet httpget = new HttpGet(addressWebhook + updateMethod + "&offset=" + lastMessageTimestamp);
+        try {
+            CloseableHttpResponse response = httpclient.execute(httpget);
+            int data = response.getEntity().getContent().read();
+            char content;
+            String body = "";
+            while (data != -1) {
+                content = (char) data;
+                body += content;
+                data = response.getEntity().getContent().read();
+            }
+            httpclient.close();
+            return body;
+        } catch(SocketTimeoutException e) {
+            System.out.println("Reconnecting...");
+            getPolling();
+            return "";
+        }
+    }
+
+    private static CloseableHttpClient createHttpClient() {
+        CloseableHttpClient httpClient;
+        PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
+        cm.setMaxTotal(306);
+        cm.setDefaultMaxPerRoute(108);
+        RequestConfig requestConfig = RequestConfig.custom()
+                .setConnectTimeout(longPollTimeout)
+                .setSocketTimeout(longPollTimeout).build();
+        httpClient = HttpClients.custom()
+                .setConnectionManager(cm)
+                .setDefaultRequestConfig(requestConfig).build();
+        return httpClient;
+    }
+
     /**
-     * Configure an interal for short polling process
-     * @param interval long interval for short polling
+     * Send a timeout for long poll process
      */
-    public TelegramBot setPolling(long interval) {
-        pollingInterval = interval;
-        updateMethod += "&timeout=" + ((int) pollingInterval/1000);
+    public TelegramBot polling() {
+        updateMethod += "?timeout=" + longPollTimeout;
         return this;
     }
 
@@ -109,7 +149,7 @@ public class TelegramBot {
      */
     void run() {
         try {
-            String updates = TelegramBot.getUpdates();
+            String updates = TelegramBot.getPolling();
             JsonArray result = getJson(updates).getAsJsonArray("result");
             JsonElement event = result.get(0);
             if(event.getAsJsonObject().has("callback_query")) {
@@ -119,8 +159,7 @@ public class TelegramBot {
                 // TextMessage
                 this.textParse(event);
             }
-            Thread.sleep(pollingInterval);
-        } catch (IOException | InterruptedException e) {
+        } catch (IOException e) {
             System.out.println(e.getMessage());
             System.exit(0);
         } finally {
@@ -130,35 +169,32 @@ public class TelegramBot {
 
     private void callbackParse(JsonElement event) {
         int timestamp = event.getAsJsonObject().get("update_id").getAsInt();
-        if(timestamp != lastMessageTimestamp) {
-            System.out.println(event);
-            JsonObject message = event.getAsJsonObject().get("callback_query").getAsJsonObject().get("message").getAsJsonObject();
-            String chat_id = message.get("chat").getAsJsonObject().get("id").getAsString();
-            String first_name = message.get("chat").getAsJsonObject().get("first_name").getAsString();
-            String last_name = message.get("chat").getAsJsonObject().get("last_name").getAsString();
-            Chat chat = new Chat(chat_id, first_name, last_name);
-            String payload = event.getAsJsonObject().get("callback_query").getAsJsonObject().get("data").getAsString();
-            this.reactionCallback.setEvent(payload, chat);
-            lastMessageTimestamp = timestamp;
-        }
+        System.out.println(event);
+        JsonObject message = event.getAsJsonObject().get("callback_query").getAsJsonObject().get("message").getAsJsonObject();
+        String chat_id = message.get("chat").getAsJsonObject().get("id").getAsString();
+        String first_name = message.get("chat").getAsJsonObject().get("first_name").getAsString();
+        String last_name = message.get("chat").getAsJsonObject().get("last_name").getAsString();
+        Chat chat = new Chat(chat_id, first_name, last_name);
+        String payload = event.getAsJsonObject().get("callback_query").getAsJsonObject().get("data").getAsString();
+        this.reactionCallback.setEvent(payload, chat);
+        lastMessageTimestamp = timestamp;
     }
 
     private void textParse(JsonElement event) {
-        int timestamp = event.getAsJsonObject().get("message").getAsJsonObject().get("date").getAsInt();
-        if(timestamp != lastMessageTimestamp) {
-            System.out.println(event);
-            JsonObject message = event.getAsJsonObject().get("message").getAsJsonObject();
-            String chat_id = message.get("chat").getAsJsonObject().get("id").getAsString();
-            String first_name = message.get("chat").getAsJsonObject().get("first_name").getAsString();
-            String last_name = message.get("chat").getAsJsonObject().get("last_name").getAsString();
-            String message_id = message.get("message_id").getAsString();
-            int message_date = message.get("date").getAsInt();
-            String text = message.get("text").getAsString();
-            TextMessage text_message = new TextMessage(message_id, message_date, text);
-            Chat chat = new Chat(chat_id, first_name, last_name);
-            this.reaction.setEvent(text_message, chat);
-            lastMessageTimestamp = timestamp;
-        }
+        int timestamp = event.getAsJsonObject().get("update_id").getAsInt();
+        System.out.println(event);
+        JsonObject message = event.getAsJsonObject().get("message").getAsJsonObject();
+        String chat_id = message.get("chat").getAsJsonObject().get("id").getAsString();
+        String first_name = message.get("chat").getAsJsonObject().get("first_name").getAsString();
+        String last_name = message.get("chat").getAsJsonObject().get("last_name").getAsString();
+        String message_id = message.get("message_id").getAsString();
+        int message_date = message.get("date").getAsInt();
+        String text = message.get("text").getAsString();
+        TextMessage text_message = new TextMessage(message_id, message_date, text);
+        Chat chat = new Chat(chat_id, first_name, last_name);
+        this.reaction.setEvent(text_message, chat);
+        lastMessageTimestamp = timestamp;
+
     }
 
     /**

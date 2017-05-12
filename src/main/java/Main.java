@@ -1,6 +1,6 @@
 public class Main {
     
-    private static final String token = "Your_token_here";
+    private static final String token = "Your_token";
 
     public static void main(String[] args) {
 
@@ -34,7 +34,6 @@ public class Main {
             }
         });
 
-        bot.setPolling(1000L).run();
-
+        bot.polling().run();
     }
 }
