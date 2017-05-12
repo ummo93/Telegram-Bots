@@ -27,6 +27,7 @@ public class TelegramBot {
     private static String offset = "?offset=-1";
     private static String sendingMethod = "/sendMessage";
     private static String sendPhotoMethod = "/sendPhoto";
+    public static String reflection = "";
     private TextEvent<TextMessage, Chat> reaction;
     private ActionEvent<String, Chat> reactionCallback;
 
@@ -44,7 +45,7 @@ public class TelegramBot {
         try {
             System.out.println("Bot has been created and hears a chat...");
             addressWebhook += address;
-            // Получаем первый timestamp
+            // Get the last update that we can get first update_id
             String firstRequestBody = TelegramBot.getUpdates();
             JsonArray result = getJson(firstRequestBody).getAsJsonArray("result");
             lastMessageTimestamp = result.get(0).getAsJsonObject().get("message").getAsJsonObject().get("date").getAsInt();
@@ -168,7 +169,6 @@ public class TelegramBot {
     }
 
     private void callbackParse(JsonElement event) {
-        int timestamp = event.getAsJsonObject().get("update_id").getAsInt();
         System.out.println(event);
         JsonObject message = event.getAsJsonObject().get("callback_query").getAsJsonObject().get("message").getAsJsonObject();
         String chat_id = message.get("chat").getAsJsonObject().get("id").getAsString();
@@ -177,11 +177,10 @@ public class TelegramBot {
         Chat chat = new Chat(chat_id, first_name, last_name);
         String payload = event.getAsJsonObject().get("callback_query").getAsJsonObject().get("data").getAsString();
         this.reactionCallback.setEvent(payload, chat);
-        lastMessageTimestamp = timestamp;
+        lastMessageTimestamp = event.getAsJsonObject().get("update_id").getAsInt();
     }
 
     private void textParse(JsonElement event) {
-        int timestamp = event.getAsJsonObject().get("update_id").getAsInt();
         System.out.println(event);
         JsonObject message = event.getAsJsonObject().get("message").getAsJsonObject();
         String chat_id = message.get("chat").getAsJsonObject().get("id").getAsString();
@@ -190,10 +189,11 @@ public class TelegramBot {
         String message_id = message.get("message_id").getAsString();
         int message_date = message.get("date").getAsInt();
         String text = message.get("text").getAsString();
+        reflection = text;
         TextMessage text_message = new TextMessage(message_id, message_date, text);
         Chat chat = new Chat(chat_id, first_name, last_name);
         this.reaction.setEvent(text_message, chat);
-        lastMessageTimestamp = timestamp;
+        lastMessageTimestamp = event.getAsJsonObject().get("update_id").getAsInt();
 
     }
 

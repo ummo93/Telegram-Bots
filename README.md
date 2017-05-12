@@ -16,8 +16,34 @@ bot.getAction((String payload, Chat dialog) -> {           // Print all action m
     System.out.println(payload);
 });
 
-bot.getMessage((TextMessage message, Chat dialog) -> {     // Return to the user his message
-    dialog.post(message.text);
+bot.getMessage((TextMessage message, Chat dialog) -> {     // Reflection
+    
+    new Reflect("^([H|h]ello|[H|h]i).*") {
+        @Override
+        void response(String match) {
+            dialog.post("And you hello :)");
+        }
+    };
+    
+    new Reflect("/menu") {
+        @Override
+        void response(String match) {
+            InlineKeyboard inlines = new InlineKeyboard(
+                    new InlineButton("Button1", "but_1"),
+                    new InlineButton("Button2", "but_2"),
+                    new InlineButton("Image", "image")
+            );
+            dialog.post("Ok, this is menu:", inlines);
+        }
+    };
+    
+    // It's mean that if bot dont know, he send messege to his friend
+    new Reflect() {
+        @Override
+        void response() {
+            dialog.post(TelegramBot.askForHelp(message.text));
+        }
+    };
 });
 
 bot.polling().run();                                       // Check updates with long polling

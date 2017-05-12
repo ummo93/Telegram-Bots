@@ -1,6 +1,6 @@
 public class Main {
     
-    private static final String token = "Your_token";
+    private static final String token = "Your_token(after_'bot')";
 
     public static void main(String[] args) {
 
@@ -14,24 +14,40 @@ public class Main {
         });
 
         bot.getMessage((TextMessage message, Chat dialog) -> {
-            switch(message.text.toLowerCase()) {
-                case("hello"):
-                    dialog.post("Hello!");
-                break;
-                case("hi"):
-                    dialog.post("And you, how are you?");
-                break;
-                case("/menu"):
+
+            new Reflect("^([H|h]ello|[H|h]i).*") {
+                @Override
+                void response(String match) {
+                    dialog.post("And you hello :)");
+                }
+            };
+
+            new Reflect(".*([A|a]uthor|[C|c]reator).*") {
+                @Override
+                void response(String match) {
+                    dialog.post("My father is ummo93 https://github.com/ummo93");
+                }
+            };
+
+            new Reflect("/menu") {
+                @Override
+                void response(String match) {
                     InlineKeyboard inlines = new InlineKeyboard(
-                        new InlineButton("Button1", "but_1"),
-                        new InlineButton("Button2", "but_2"),
-                        new InlineButton("Image", "image")
+                            new InlineButton("Button1", "but_1"),
+                            new InlineButton("Button2", "but_2"),
+                            new InlineButton("Image", "image")
                     );
                     dialog.post("Ok, this is menu:", inlines);
-                break;
-                default:
+                }
+            };
+
+            new Reflect() {
+                @Override
+                void response() {
                     dialog.post(TelegramBot.askForHelp(message.text));
-            }
+                }
+            };
+
         });
 
         bot.polling().run();
