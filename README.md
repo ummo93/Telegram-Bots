@@ -8,7 +8,7 @@ Library not packed yet, for simplify it usage, but it is in the plans.
 
 #### For example:
  ```java
-String token = "123123123:ASAddmafawfqWD-123FwqafwaWFAf"; // Your bot token from botfather
+String token = "392121257:AAGrLhQELYQ1Zj_-O8asyH2nabz63TtGmsc"; // Your bot token from botfather
 
 TelegramBot bot = new TelegramBot(token);                  // Creates a bot object
 
