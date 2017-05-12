@@ -43,8 +43,7 @@ public class TelegramBot {
             // Получаем первый timestamp
             String firstRequestBody = TelegramBot.getUpdates();
             JsonArray result = getJson(firstRequestBody).getAsJsonArray("result");
-            int timestamp = result.get(0).getAsJsonObject().get("message").getAsJsonObject().get("date").getAsInt();
-            lastMessageTimestamp = timestamp;
+            lastMessageTimestamp = result.get(0).getAsJsonObject().get("message").getAsJsonObject().get("date").getAsInt();
         } catch(Exception e) {
             System.out.println(e.getMessage());
         }

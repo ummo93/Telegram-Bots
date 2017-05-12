@@ -22,12 +22,11 @@ public class Main {
                     dialog.post("And you, how are you?");
                 break;
                 case("/menu"):
-                    InlineButton[] buttons = {
+                    InlineKeyboard inlines = new InlineKeyboard(
                         new InlineButton("Button1", "but_1"),
                         new InlineButton("Button2", "but_2"),
                         new InlineButton("Image", "image")
-                    };
-                    InlineKeyboard inlines = new InlineKeyboard(buttons);
+                    );
                     dialog.post("Ok, this is menu:", inlines);
                 break;
                 default:

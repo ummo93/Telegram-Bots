@@ -6,8 +6,8 @@ public class InlineKeyboard {
 
     public InlineKeyboard(InlineButton... buttons) {
         arr = new JsonArray();
-        for(int i = 0; i < buttons.length; i++) {
-            this.arr.add(buttons[i].toJSON());
+        for (InlineButton button : buttons) {
+            this.arr.add(button.toJSON());
         }
     }
     public InlineKeyboard() {

@@ -17,8 +17,7 @@ public class InlineButton {
         this.callback = callback;
     }
     public JsonArray toJSON() {
-        JsonArray result = this.isURL ? parseURL() : parseCallbackButton();
-        return result;
+        return this.isURL ? parseURL() : parseCallbackButton();
     }
 
     private JsonArray parseCallbackButton() {
