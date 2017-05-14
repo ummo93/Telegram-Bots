@@ -5,7 +5,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.github.ummo93</groupId>
   <version>0.9.0</version>
-  <artifactId>TelegramBot</artifactId>
+  <artifactId>Telegram-Bots</artifactId>
   <dependencies>
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
