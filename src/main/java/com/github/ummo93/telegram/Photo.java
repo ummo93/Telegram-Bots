@@ -1,15 +1,15 @@
-package com.github.ummo93;
+package com.github.ummo93.telegram;
 
-public class Audio {
+public class Photo {
 
     private String url;
     private String caption = "";
 
-    public Audio(String url) {
+    public Photo(String url, String caption) {
         this.url = url;
+        this.caption = caption;
     }
-
-    public Audio(String url, String caption) {
+    public Photo(String url) {
         this.url = url;
         this.caption = caption;
     }
@@ -17,9 +17,7 @@ public class Audio {
     public String getUrl() {
         return this.url;
     }
-
     public String getCaption() {
         return this.caption;
     }
-
 }
