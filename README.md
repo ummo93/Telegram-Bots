@@ -1,5 +1,5 @@
 # Easy telegram bot library
-[![Repo](https://jitpack.io/v/ummo93/TelegramBot.svg)](https://jitpack.io/#ummo93/TelegramBot)
+[![Repo](https://jitpack.io/v/ummo93/Telegram-Bots.svg)](https://jitpack.io/#ummo93/Telegram-Bots)
 ![img](https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Telegram_text_logo.svg/500px-Telegram_text_logo.svg.png)
 
 #### Description
@@ -28,7 +28,7 @@ In pom.xml file there should be an instruction containing the repository address
  ```xml
 	<dependency>
 	    <groupId>com.github.ummo93</groupId>
-	    <artifactId>TelegramBot</artifactId>
+	    <artifactId>Telegram-Bots</artifactId>
 	    <version>0.9.0</version>
 	</dependency>
  ```
