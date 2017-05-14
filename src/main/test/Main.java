@@ -1,4 +1,4 @@
-import com.github.ummo93.telegram.*;
+import com.appartika.telegram.*;
 
 public class Main {
 

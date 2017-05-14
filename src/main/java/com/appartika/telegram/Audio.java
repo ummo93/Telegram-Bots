@@ -1,15 +1,15 @@
-package com.github.ummo93.telegram;
+package com.appartika.telegram;
 
-public class Photo {
+public class Audio {
 
     private String url;
     private String caption = "";
 
-    public Photo(String url, String caption) {
+    public Audio(String url) {
         this.url = url;
-        this.caption = caption;
     }
-    public Photo(String url) {
+
+    public Audio(String url, String caption) {
         this.url = url;
         this.caption = caption;
     }
@@ -17,7 +17,9 @@ public class Photo {
     public String getUrl() {
         return this.url;
     }
+
     public String getCaption() {
         return this.caption;
     }
+
 }

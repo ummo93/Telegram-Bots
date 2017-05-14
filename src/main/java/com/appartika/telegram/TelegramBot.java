@@ -1,4 +1,4 @@
-package com.github.ummo93.telegram;
+package com.appartika.telegram;
 
 import java.io.IOException;
 import java.net.SocketTimeoutException;

@@ -1,4 +1,4 @@
-package com.github.ummo93.telegram;
+package com.appartika.telegram;
 
 public class Chat {
 
