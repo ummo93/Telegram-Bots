@@ -1,3 +1,5 @@
+package com.github.ummo93;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 

@@ -1,3 +1,5 @@
+package com.github.ummo93;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
@@ -7,12 +9,12 @@ public class InlineButton {
     public String url = "";
     public String callback = "";
 
-    InlineButton(String text, boolean isURL, String url) {
+    public InlineButton(String text, boolean isURL, String url) {
         this.text = text;
         this.isURL = isURL;
         this.url = url;
     }
-    InlineButton(String text, String callback) {
+    public InlineButton(String text, String callback) {
         this.text = text;
         this.callback = callback;
     }

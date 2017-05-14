@@ -1,10 +1,12 @@
+package com.github.ummo93;
+
 import java.util.regex.*;
 
 public class Reflect {
 
     private static boolean isUnhandledError = true;
 
-    Reflect(String regexp) {
+    public Reflect(String regexp) {
         Pattern pattern = Pattern.compile(regexp);
         Matcher matcher = pattern.matcher(TelegramBot.reflection);
         if (matcher.matches()) {
@@ -13,7 +15,7 @@ public class Reflect {
         }
 
     }
-    Reflect() {
+    public Reflect() {
         if(isUnhandledError) {
             response();
         } else {
@@ -21,6 +23,6 @@ public class Reflect {
         }
     }
 
-    void response(String match){}
-    void response(){}
+    public void response(String match){}
+    public void response(){}
 }

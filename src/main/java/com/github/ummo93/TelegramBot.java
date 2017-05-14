@@ -1,3 +1,5 @@
+package com.github.ummo93;
+
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.net.URLEncoder;
@@ -20,13 +22,11 @@ import com.google.gson.*;
 
 public class TelegramBot {
 
-    private static int longPollTimeout = 300000;
+    private static int longPollTimeout = 200000;
     private static int lastMessageTimestamp = 0;
     private static String addressWebhook = "https://api.telegram.org/bot";
     private static String updateMethod = "/getUpdates";
     private static String offset = "?offset=-1";
-    private static String sendingMethod = "/sendMessage";
-    private static String sendPhotoMethod = "/sendPhoto";
     public static String reflection = "";
     private TextEvent<TextMessage, Chat> reaction;
     private ActionEvent<String, Chat> reactionCallback;
@@ -34,8 +34,8 @@ public class TelegramBot {
     /**
      * Create a bot object. Example of usage:
      * <pre>
-     * TelegramBot bot = new TelegramBot("1234567:ABCDEFGH$-01231141ASAFGQ1");
-     * bot.getMessage((TextMessage message, Chat dialog) -> {
+     * com.herokuapp.luniverse.TelegramBot bot = new com.herokuapp.luniverse.TelegramBot("1234567:ABCDEFGH$-01231141ASAFGQ1");
+     * bot.getMessage((com.herokuapp.luniverse.TextMessage message, com.herokuapp.luniverse.Chat dialog) -> {
      *     dialog.post("Hello!");
      * }
      * bot.polling().run();
@@ -57,7 +57,7 @@ public class TelegramBot {
     /**
      * Registration a lambda which activates when bot get an text message
      * <pre>
-     * bot.getMessage((TextMessage message, Chat dialog) -> {
+     * bot.getMessage((com.herokuapp.luniverse.TextMessage message, com.herokuapp.luniverse.Chat dialog) -> {
      *     // What is going to happen 
      * }
      * </pre>
@@ -70,7 +70,7 @@ public class TelegramBot {
      * Registration a lambda which activates when bot get an action
      * (for example, user click to inline button)
      * <pre>
-     * bot.getAction((String payload, Chat dialog) -> {
+     * bot.getAction((String payload, com.herokuapp.luniverse.Chat dialog) -> {
      *     // What is going to happen 
      * }
      * </pre>
@@ -148,7 +148,7 @@ public class TelegramBot {
     /**
      * Start bot's lifecycle and polling process
      */
-    void run() {
+    public void run() {
         try {
             String updates = TelegramBot.getPolling();
             JsonArray result = getJson(updates).getAsJsonArray("result");
@@ -157,7 +157,7 @@ public class TelegramBot {
                 // Callback
                 this.callbackParse(event);
             } else {
-                // TextMessage
+                // com.herokuapp.luniverse.TextMessage
                 this.textParse(event);
             }
         } catch (IOException e) {
@@ -203,66 +203,58 @@ public class TelegramBot {
      * @param text String text message
      */
     public static void send(String recipient, String text) {
-        try{
-            CloseableHttpClient httpclient = HttpClients.createDefault();
-            HttpPost httppost = new HttpPost(addressWebhook + sendingMethod);
-            List <NameValuePair> nvps = new ArrayList <NameValuePair>();
-            nvps.add(new BasicNameValuePair("text", text));
-            nvps.add(new BasicNameValuePair("chat_id", recipient));
-            httppost.setEntity(new UrlEncodedFormEntity(nvps, StandardCharsets.UTF_8));
-            httpclient.execute(httppost);
-        } catch(ClientProtocolException e) {
-            System.out.println("Client protocol exception: ");
-            System.out.println(e.getMessage());
-        } catch(IOException e) {
-            System.out.println(e.getMessage());
-        }
+        List <NameValuePair> nvps = new ArrayList <NameValuePair>();
+        nvps.add(new BasicNameValuePair("text", text));
+        nvps.add(new BasicNameValuePair("chat_id", recipient));
+        sendPOST(addressWebhook + "/sendMessage", nvps);
     }
 
     /**
-     * Send InlineKeyboard markup
+     * Send com.herokuapp.luniverse.InlineKeyboard markup
      * @param recipient String chat_id from telegram
      * @param text String text message which attached to keyboard markup
-     * @param ik InlineKeyboard keyboard markup
+     * @param ik com.herokuapp.luniverse.InlineKeyboard keyboard markup
      */
     public static void send(String recipient, String text, InlineKeyboard ik) {
-        try{
-            CloseableHttpClient httpclient = HttpClients.createDefault();
-            HttpPost httppost = new HttpPost(addressWebhook + sendingMethod);
-            List <NameValuePair> nvps = new ArrayList <NameValuePair>();
-            nvps.add(new BasicNameValuePair("text", text));
-            nvps.add(new BasicNameValuePair("chat_id", recipient));
-            nvps.add(new BasicNameValuePair("reply_markup", ik.toJSON()));
-            httppost.setEntity(new UrlEncodedFormEntity(nvps, StandardCharsets.UTF_8));
-            httpclient.execute(httppost);
-        } catch(ClientProtocolException e) {
-            System.out.println("Client protocol exception: ");
-            System.out.println(e.getMessage());
-        } catch(IOException e) {
-            System.out.println(e.getMessage());
-        }
+        List <NameValuePair> nvps = new ArrayList <NameValuePair>();
+        nvps.add(new BasicNameValuePair("text", text));
+        nvps.add(new BasicNameValuePair("chat_id", recipient));
+        nvps.add(new BasicNameValuePair("reply_markup", ik.toJSON()));
+        sendPOST(addressWebhook + "/sendMessage", nvps);
     }
 
     /**
      * Send an image to chat by URL
      * @param recipient String chat_id from telegram
-     * @param url String image url
+     * @param photo com.herokuapp.luniverse.Photo photo by url and caption
      */
-    public static void sendPhoto(String recipient, String url) {
-        try{
-            CloseableHttpClient httpclient = HttpClients.createDefault();
-            HttpPost httppost = new HttpPost(addressWebhook + sendPhotoMethod);
-            List <NameValuePair> nvps = new ArrayList <NameValuePair>();
-            nvps.add(new BasicNameValuePair("photo", url));
-            nvps.add(new BasicNameValuePair("chat_id", recipient));
-            httppost.setEntity(new UrlEncodedFormEntity(nvps, StandardCharsets.UTF_8));
-            httpclient.execute(httppost);
-        } catch(ClientProtocolException e) {
-            System.out.println("Client protocol exception: ");
-            System.out.println(e.getMessage());
-        } catch(IOException e) {
-            System.out.println(e.getMessage());
+    public static void send(String recipient, Photo photo) {
+        List <NameValuePair> nvps = new ArrayList <NameValuePair>();
+        nvps.add(new BasicNameValuePair("photo", photo.getUrl()));
+        nvps.add(new BasicNameValuePair("chat_id", recipient));
+        if(photo.getCaption().length() > 0 && photo.getCaption().length() < 200) {
+            nvps.add(new BasicNameValuePair("caption", photo.getCaption()));
+        } else if (photo.getCaption().length() > 200) {
+            System.out.println("com.herokuapp.luniverse.Photo caption has a limit 200 chars");
         }
+        sendPOST(addressWebhook + "/sendPhoto", nvps);
+    }
+
+    /**
+     * Send an audio file to chat by URL
+     * @param recipient String chat_id from telegram
+     * @param audio com.herokuapp.luniverse.Audio audio object
+     */
+    public static void send(String recipient, Audio audio) {
+        List <NameValuePair> nvps = new ArrayList <NameValuePair>();
+        nvps.add(new BasicNameValuePair("audio", audio.getUrl()));
+        nvps.add(new BasicNameValuePair("chat_id", recipient));
+        if(audio.getCaption().length() > 0 && audio.getCaption().length() < 200) {
+            nvps.add(new BasicNameValuePair("caption", audio.getCaption()));
+        } else if (audio.getCaption().length() > 200) {
+            System.out.println("com.herokuapp.luniverse.Audio caption has a limit 200 chars");
+        }
+        sendPOST(addressWebhook + "/sendAudio", nvps);
     }
 
     /**
@@ -293,6 +285,25 @@ public class TelegramBot {
         } catch (Exception e) {
             System.out.println(e.getMessage());
             return "Sorry, i don't know...";
+        }
+    }
+
+    /**
+     * Send POST request to Telegram API (for send a photos, audio, etc)
+     * @param address String URL and telegram method
+     * @param nvps List <NameValuePair> POST parameters
+     */
+    private static void sendPOST(String address, List <NameValuePair> nvps) {
+        try{
+            CloseableHttpClient httpclient = HttpClients.createDefault();
+            HttpPost httppost = new HttpPost(address);
+            httppost.setEntity(new UrlEncodedFormEntity(nvps, StandardCharsets.UTF_8));
+            httpclient.execute(httppost);
+        } catch(ClientProtocolException e) {
+            System.out.println("Client protocol exception: ");
+            System.out.println(e.getMessage());
+        } catch(IOException e) {
+            System.out.println(e.getMessage());
         }
     }
 
