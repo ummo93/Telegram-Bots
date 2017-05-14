@@ -36,46 +36,54 @@ In pom.xml file there should be an instruction containing the repository address
 #### For example:
  ```java
 import com.appartika.telegram.*;
- 
-String token = "392121257:AAGrLhQELYQ1Zj_-O8asyH2nabz63TtGmsc"; // Your bot token from botfather
 
-TelegramBot bot = new TelegramBot(token);                       // Creates a bot object
+public class Main {
 
-bot.getAction((String payload, Chat dialog) -> {                // Print all action messages
-    System.out.println(payload);
-});
+    public static void main(String[] args) {
+        
+        String token = "392121257:AAGrLhQELYQ1Zj_-O8asyH2nabz63TtGmsc"; // Your bot token from botfather
 
-bot.getMessage((TextMessage message, Chat dialog) -> {          // Reflection
-    
-    new Reflect("^([H|h]ello|[H|h]i).*") {
-        @Override
-        public void response(String match) {
-            dialog.post("And you hello :)");
-        }
-    };
-    
-    new Reflect("/menu") {
-        @Override
-        public void response(String match) {
-            InlineKeyboard inlines = new InlineKeyboard(
-                    new InlineButton("Button1", "but_1"),
-                    new InlineButton("Button2", "but_2"),
-                    new InlineButton("Image", "image")
-            );
-            dialog.post("Ok, this is menu:", inlines);
-        }
-    };
-    
-    // It's mean that if bot dont know, he send messege to his friend
-    new Reflect() {
-        @Override
-        public void response() {
-            dialog.post(TelegramBot.askForHelp(message.text));
-        }
-    };
-});
+        TelegramBot bot = new TelegramBot(token);                       // Creates a bot object
 
-bot.polling().run(); // Check updates with long polling
+        bot.getAction((String payload, Chat dialog) -> {                // Print all action messages
+            System.out.println(payload);
+        });
+
+        bot.getMessage((TextMessage message, Chat dialog) -> {          // Reflection
+
+            new Reflect("^([H|h]ello|[H|h]i).*") {
+                @Override
+                public void response(String match) {
+                    dialog.post("And you hello :)");
+                }
+            };
+
+            new Reflect("/menu") {
+                @Override
+                public void response(String match) {
+                    InlineKeyboard inlines = new InlineKeyboard(
+                            new InlineButton("Button1", "but_1"),
+                            new InlineButton("Button2", "but_2"),
+                            new InlineButton("Image", "image")
+                    );
+                    dialog.post("Ok, this is menu:", inlines);
+                }
+            };
+
+            // It's mean that if bot dont know, he send messege to his friend
+            new Reflect() {
+                @Override
+                public void response() {
+                    dialog.post(TelegramBot.askForHelp(message.text));
+                }
+            };
+        });
+
+        bot.polling().run(); // Check updates with long polling
+
+
+    }
+}
  ```
 
 #### Supported message types
