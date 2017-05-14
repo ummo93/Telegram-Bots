@@ -29,13 +29,13 @@ In pom.xml file there should be an instruction containing the repository address
 	<dependency>
 	    <groupId>com.github.ummo93</groupId>
 	    <artifactId>Telegram-Bots</artifactId>
-	    <version>0.9.0</version>
+	    <version>0.9.1</version>
 	</dependency>
  ```
 
 #### For example:
  ```java
-import com.github.ummo93.telegram.*;
+import com.appartika.telegram.*;
  
 String token = "392121257:AAGrLhQELYQ1Zj_-O8asyH2nabz63TtGmsc"; // Your bot token from botfather
 
