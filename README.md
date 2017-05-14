@@ -35,7 +35,7 @@ In pom.xml file there should be an instruction containing the repository address
 
 #### For example:
  ```java
-import com.github.ummo93.*;
+import com.github.ummo93.telegram.*;
  
 String token = "392121257:AAGrLhQELYQ1Zj_-O8asyH2nabz63TtGmsc"; // Your bot token from botfather
 

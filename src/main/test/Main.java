@@ -1,4 +1,4 @@
-import com.github.ummo93.*;
+import com.github.ummo93.telegram.*;
 
 public class Main {
 
