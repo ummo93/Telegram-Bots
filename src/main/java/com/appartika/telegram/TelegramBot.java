@@ -34,8 +34,8 @@ public class TelegramBot {
     /**
      * Create a bot object. Example of usage:
      * <pre>
-     * com.herokuapp.luniverse.TelegramBot bot = new com.herokuapp.luniverse.TelegramBot("1234567:ABCDEFGH$-01231141ASAFGQ1");
-     * bot.getMessage((com.herokuapp.luniverse.TextMessage message, com.herokuapp.luniverse.Chat dialog) -> {
+     * TelegramBot bot = new TelegramBot("1234567:ABCDEFGH$-01231141ASAFGQ1");
+     * bot.getMessage((TextMessage message, Chat dialog) -> {
      *     dialog.post("Hello!");
      * }
      * bot.polling().run();
@@ -57,7 +57,7 @@ public class TelegramBot {
     /**
      * Registration a lambda which activates when bot get an text message
      * <pre>
-     * bot.getMessage((com.herokuapp.luniverse.TextMessage message, com.herokuapp.luniverse.Chat dialog) -> {
+     * bot.getMessage((TextMessage message, Chat dialog) -> {
      *     // What is going to happen 
      * }
      * </pre>
@@ -70,7 +70,7 @@ public class TelegramBot {
      * Registration a lambda which activates when bot get an action
      * (for example, user click to inline button)
      * <pre>
-     * bot.getAction((String payload, com.herokuapp.luniverse.Chat dialog) -> {
+     * bot.getAction((String payload, Chat dialog) -> {
      *     // What is going to happen 
      * }
      * </pre>
@@ -157,7 +157,7 @@ public class TelegramBot {
                 // Callback
                 this.callbackParse(event);
             } else {
-                // com.herokuapp.luniverse.TextMessage
+                // TextMessage
                 this.textParse(event);
             }
         } catch (IOException e) {
@@ -210,10 +210,10 @@ public class TelegramBot {
     }
 
     /**
-     * Send com.herokuapp.luniverse.InlineKeyboard markup
+     * Send InlineKeyboard markup
      * @param recipient String chat_id from telegram
      * @param text String text message which attached to keyboard markup
-     * @param ik com.herokuapp.luniverse.InlineKeyboard keyboard markup
+     * @param ik InlineKeyboard keyboard markup
      */
     public static void send(String recipient, String text, InlineKeyboard ik) {
         List <NameValuePair> nvps = new ArrayList <NameValuePair>();
@@ -224,9 +224,22 @@ public class TelegramBot {
     }
 
     /**
+     * Send ReplyKeyboard markup
+     * @param recipient String chat_id from telegram
+     * @param rk InlineKeyboard keyboard markup
+     */
+    public static void send(String recipient, String text, ReplyKeyboard rk) {
+        List <NameValuePair> nvps = new ArrayList <NameValuePair>();
+        nvps.add(new BasicNameValuePair("chat_id", recipient));
+        nvps.add(new BasicNameValuePair("text", text));
+        nvps.add(new BasicNameValuePair("reply_markup", rk.toJSON()));
+        sendPOST(addressWebhook + "/sendMessage", nvps);
+    }
+
+    /**
      * Send an image to chat by URL
      * @param recipient String chat_id from telegram
-     * @param photo com.herokuapp.luniverse.Photo photo by url and caption
+     * @param photo Photo photo by url and caption
      */
     public static void send(String recipient, Photo photo) {
         List <NameValuePair> nvps = new ArrayList <NameValuePair>();
@@ -235,7 +248,7 @@ public class TelegramBot {
         if(photo.getCaption().length() > 0 && photo.getCaption().length() < 200) {
             nvps.add(new BasicNameValuePair("caption", photo.getCaption()));
         } else if (photo.getCaption().length() > 200) {
-            System.out.println("com.herokuapp.luniverse.Photo caption has a limit 200 chars");
+            System.out.println("Photo caption has a limit 200 chars");
         }
         sendPOST(addressWebhook + "/sendPhoto", nvps);
     }
@@ -243,7 +256,7 @@ public class TelegramBot {
     /**
      * Send an audio file to chat by URL
      * @param recipient String chat_id from telegram
-     * @param audio com.herokuapp.luniverse.Audio audio object
+     * @param audio Audio audio object
      */
     public static void send(String recipient, Audio audio) {
         List <NameValuePair> nvps = new ArrayList <NameValuePair>();
@@ -252,9 +265,17 @@ public class TelegramBot {
         if(audio.getCaption().length() > 0 && audio.getCaption().length() < 200) {
             nvps.add(new BasicNameValuePair("caption", audio.getCaption()));
         } else if (audio.getCaption().length() > 200) {
-            System.out.println("com.herokuapp.luniverse.Audio caption has a limit 200 chars");
+            System.out.println("Audio caption has a limit 200 chars");
         }
         sendPOST(addressWebhook + "/sendAudio", nvps);
+    }
+
+    public static void sendRemoveKeyboard(String recipient, String text) {
+        List <NameValuePair> nvps = new ArrayList <NameValuePair>();
+        nvps.add(new BasicNameValuePair("chat_id", recipient));
+        nvps.add(new BasicNameValuePair("text", text));
+        nvps.add(new BasicNameValuePair("reply_markup", "{\"remove_keyboard\": true}"));
+        sendPOST(addressWebhook + "/sendMessage", nvps);
     }
 
     /**

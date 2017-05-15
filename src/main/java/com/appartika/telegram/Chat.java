@@ -16,4 +16,6 @@ public class Chat {
     public void post(String text) { TelegramBot.send(this.id, text); }
     public void post(Photo photo) { TelegramBot.send(this.id, photo); }
     public void post(String text, InlineKeyboard ik) { TelegramBot.send(this.id, text, ik); }
+    public void post(String text, ReplyKeyboard rk) { TelegramBot.send(this.id, text, rk); }
+    public void removeKeyboard(String text) {TelegramBot.sendRemoveKeyboard(this.id, text);}
 }

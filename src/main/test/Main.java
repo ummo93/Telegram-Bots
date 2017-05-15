@@ -62,13 +62,24 @@ public class Main {
                 }
             };
 
-            new Reflect() {
+            new Reflect("/test") {
                 @Override
-                public void response() {
-                    dialog.post(TelegramBot.askForHelp(message.text));
+                public void response(String match) {
+                    ReplyKeyboard keyboard = new ReplyKeyboard(
+                        new KeyboardButton("Button 1"),
+                        new KeyboardButton("Button 2"),
+                        new KeyboardButton("Button 3")
+                    );
+                    dialog.post("This is reply markup", keyboard);
                 }
             };
 
+            new Reflect() {
+                @Override
+                public void response() {
+                    dialog.removeKeyboard(TelegramBot.askForHelp(message.text));
+                }
+            };
         });
 
         bot.polling().run();

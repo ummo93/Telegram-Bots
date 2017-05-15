@@ -29,7 +29,7 @@ In pom.xml file there should be an instruction containing the repository address
 	<dependency>
 	    <groupId>com.github.ummo93</groupId>
 	    <artifactId>Telegram-Bots</artifactId>
-	    <version>0.9.1</version>
+	    <version>0.9.2</version>
 	</dependency>
  ```
 
@@ -91,4 +91,5 @@ Now this lib. supported a basic content types, such as:
 - Text message,
 - Message with images and audio (using external url),
 - Text message with Inline Keyboard Markup
+- Reply keyboard markup, and method for delete it
 - Callback message (actions from keyboard)
